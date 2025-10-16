@@ -573,7 +573,7 @@ export async function generateMockData(uid, game, count = 100) {
    * @param {Object} game 游戏对象
    * @returns {Promise<Object>} UIGF格式的对象
    */
-  async exportToUIGF(uid, game) {
+  exportToUIGF = async (uid, game) => {
     const entries = await getGachaEntriesByUidSortedByTime(uid, game.value, true);
     const info = {
       export_timestamp: Math.floor(Date.now() / 1000),
