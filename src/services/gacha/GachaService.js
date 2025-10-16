@@ -582,10 +582,9 @@ export async function generateMockData(uid, game, count = 100) {
       version: 'v4.1',
     };
 
-       const uigf_list = entries.map(entry => entry.toUIGF());
+    const uigf_list = entries.map(entry => entry.toUIGF());
 
-    const gameKey = game.value === 'GI' ? 'hk4e' : (game.value === 'HSR' ? 'hkrpg' : 'nap');ap');
-
+    const gameKey = game.value === 'GI' ? 'hk4e' : (game.value === 'HSR' ? 'hkrpg' : 'nap');
     return {
       info,
       [gameKey]: [
