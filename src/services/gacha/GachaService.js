@@ -91,7 +91,7 @@ class GachaService {
    */
   async exportGachaEntries(uid, game) {
     const entries = await getGachaEntriesByUidSortedByTime(uid, game.value, true);
-    return entries.map(entry => entry.toJSON());
+    return this.exportToUIGF(uid, game);
   }
 
   /**
@@ -539,7 +539,7 @@ export async function importGachaData(jsonData, uid, game) {
 }
 
 export async function exportGachaData(uid, game) {
-  return gachaService.exportGachaEntries(uid, game);
+  return gachaService.exportToUIGF(uid, game);
 }
 
 export async function getGachaStats(uid, game) {
@@ -565,3 +565,37 @@ export async function getProfilesByGame(game) {
 export async function generateMockData(uid, game, count = 100) {
   return gachaService.generateMockGachaEntries(uid, game, count);
 }
+
+
+  /**
+   * 导出为UIGF格式
+   * @param {string} uid 用户ID
+   * @param {Object} game 游戏对象
+   * @returns {Promise<Object>} UIGF格式的对象
+   */
+  async exportToUIGF(uid, game) {
+    const entries = await getGachaEntriesByUidSortedByTime(uid, game.value, true);
+    const info = {
+      export_timestamp: Math.floor(Date.now() / 1000),
+      export_app: 'Stellagogue',
+      export_app_version: '0.0.0',
+      version: 'v4.1',
+    };
+
+       const uigf_list = entries.map(entry => entry.toUIGF());
+
+    const gameKey = game.value === 'GI' ? 'hk4e' : (game.value === 'HSR' ? 'hkrpg' : 'nap');ap');
+
+    return {
+      info,
+      [gameKey]: [
+        {
+          uid: uid,
+          timezone: 8, // Assuming timezone +8
+          lang: 'zh-cn',
+          list: uigf_list,
+        },
+      ],
+    };
+  }
+

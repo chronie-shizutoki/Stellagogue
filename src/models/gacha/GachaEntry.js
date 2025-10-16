@@ -130,3 +130,23 @@ export class GachaEntryProtocol {
     throw new Error('GachaEntryProtocol is an interface and cannot be instantiated directly');
   }
 }
+
+
+  /**
+   * 将对象转换为UIGF list item格式
+   * @returns {Object} UIGF list item格式的对象
+   */
+  toUIGF() {
+    return {
+      gacha_type: String(this.gachaType),
+      item_id: String(this.itemID),
+      count: String(this.count),
+      time: this.time,
+      name: this.name,
+      item_type: this.itemType,
+      rank_type: String(this.rankType),
+      id: String(this.id),
+      uigf_gacha_type: String(this.gachaType),
+    };
+  }
+
