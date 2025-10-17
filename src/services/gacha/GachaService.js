@@ -84,14 +84,93 @@ class GachaService {
   }
 
   /**
-   * 导出抽卡记录为JSON格式
+   * 导出抽卡记录为JSON格式，符合UIGF标准
    * @param {string} uid 用户ID
    * @param {Object} game 游戏对象
-   * @returns {Promise<Array<Object>>} 抽卡记录的JSON数组
+   * @returns {Promise<Object>} 符合UIGF标准的抽卡记录JSON对象
    */
   async exportGachaEntries(uid, game) {
     const entries = await getGachaEntriesByUidSortedByTime(uid, game.value, true);
-    return entries.map(entry => entry.toJSON());
+    
+    // 根据游戏类型获取对应的key
+    const gameKey = this._getGameKey(game.value);
+    
+    // 转换条目为符合标准的格式
+    const formattedEntries = entries.map(entry => this._formatGachaEntryForExport(entry));
+    
+    // 创建符合UIGF标准的导出对象
+    const exportData = {
+      info: {
+        export_timestamp: Math.floor(Date.now() / 1000), // 当前时间戳（秒级）
+        export_app: 'Stellagogue',
+        export_app_version: '1.0.0', // 固定版本号，避免使用process.env
+        version: 'v4.1' // 符合UIGF标准的版本号
+      }
+    };
+    
+    // 添加游戏特定的数据
+    exportData[gameKey] = [{
+      uid: uid,
+      timezone: 8, // 默认时区偏移，中国时区
+      lang: 'zh-cn', // 默认语言
+      list: formattedEntries
+    }];
+    
+    return exportData;
+  }
+  
+  /**
+   * 根据游戏类型获取对应的key
+   * @param {string} gameValue 游戏类型值
+   * @returns {string} 游戏对应的key
+   */
+  _getGameKey(gameValue) {
+    const gameKeyMap = {
+      'genshinImpact': 'hk4e',
+      'starRail': 'hkrpg',
+      'zzz': 'nap'
+    };
+    
+    return gameKeyMap[gameValue] || 'hk4e'; // 默认使用原神的key
+  }
+  
+  /**
+   * 格式化抽卡条目为导出格式
+   * @param {GachaEntry} entry 抽卡条目
+   * @returns {Object} 格式化后的抽卡条目
+   */
+  _formatGachaEntryForExport(entry) {
+    const formatted = {
+      gacha_type: entry.gachaType,
+      item_id: entry.itemID,
+      count: entry.count,
+      time: entry.time,
+      name: entry.name,
+      item_type: entry.itemType,
+      rank_type: entry.rankType,
+      id: entry.id
+    };
+    
+    // 如果有gachaID，则添加
+    if (entry.gachaID) {
+      formatted.gacha_id = entry.gachaID;
+    }
+    
+    // 对于原神，需要添加uigf_gacha_type
+    if (entry.game === 'GI' || entry.game === 'genshinImpact') {
+      // 映射gacha_type到uigf_gacha_type
+      const uigfTypeMap = {
+        '100': '100', // 新手祈愿
+        '200': '200', // 常驻祈愿
+        '301': '301', // 角色活动祈愿
+        '302': '302', // 武器活动祈愿
+        '400': '301', // 角色活动祈愿-2
+        '500': '500'  // 集录祈愿
+      };
+      formatted.uigf_gacha_type = uigfTypeMap[entry.gachaType] || entry.gachaType;
+    }
+    
+    return formatted;
   }
 
   /**

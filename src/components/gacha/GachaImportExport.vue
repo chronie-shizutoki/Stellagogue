@@ -53,7 +53,7 @@
       <!-- 导出为文件 -->
       <div class="export-option">
         <button class="export-btn" @click="exportToFile" :disabled="isLoading">
-          导出为JSON文件
+          导出为JSON文件（UIGF 4.1）
         </button>
         <select v-model="exportFormat" class="export-format">
           <option value="json">JSON格式</option>
