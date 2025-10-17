@@ -120,18 +120,6 @@ export class GachaEntry {
     const limitedTypes = ['5', '6', '1', '2'];
     return limitedTypes.includes(this.gachaType);
   }
-}
-
-/**
- * 用于类型检查的接口定义
- */
-export class GachaEntryProtocol {
-  constructor() {
-    throw new Error('GachaEntryProtocol is an interface and cannot be instantiated directly');
-  }
-}
-
-
   /**
    * 将对象转换为UIGF list item格式
    * @returns {Object} UIGF list item格式的对象
@@ -149,4 +137,13 @@ export class GachaEntryProtocol {
       uigf_gacha_type: String(this.gachaType),
     };
   }
+}
 
+/**
+ * 用于类型检查的接口定义
+ */
+export class GachaEntryProtocol {
+  constructor() {
+    throw new Error('GachaEntryProtocol is an interface and cannot be instantiated directly');
+  }
+}
